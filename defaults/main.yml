@@ -1,0 +1,22 @@
+---
+# defaults/main.yml
+# Ces variables peuvent être surchargées par l'utilisateur
+
+# MariaDB
+wp_db_name: "wordpress"
+wp_db_user: "example"
+wp_db_password: "examplePW"
+wp_db_host: "localhost"
+wp_db_root_password: "examplerootPW"
+
+# WordPress
+wp_wordpress_download_url: "https://wordpress.org/latest.zip"
+wp_wordpress_install_dir: "/var/www/html"
+
+# Apache
+wp_server_name: "localhost"
+wp_server_admin: "admin@localhost"
+wp_server_port: 80
+
+# Environnement
+wp_deployment_is_container: true

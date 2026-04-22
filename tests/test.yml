@@ -1,0 +1,43 @@
+---
+# tests/test.yml
+- name: Test du rôle WordPress
+  hosts: all
+  become: yes
+
+  vars:
+    wp_db_name: "wordpress"
+    wp_db_user: "example"
+    wp_db_password: "examplePW"
+    wp_db_root_password: "examplerootPW"
+    wp_server_name: "localhost"
+    wp_deployment_is_container: true
+
+  pre_tasks:
+    - name: (Debian) Installer Python MySQL pour les modules community.mysql
+      ansible.builtin.apt:
+        name: python3-mysqldb
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: (RedHat) Installer Python MySQL pour les modules community.mysql
+      ansible.builtin.dnf:
+        name: python3-PyMySQL
+        state: present
+      when: ansible_os_family == "RedHat"
+
+  roles:
+    - role: ansible-role-wordpress
+
+  post_tasks:
+    - name: Vérifier que wp-config.php existe
+      ansible.builtin.stat:
+        path: /var/www/html/wp-config.php
+      register: wp_config_check
+
+    - name: Valider que WordPress est déployé
+      ansible.builtin.assert:
+        that:
+          - wp_config_check.stat.exists
+        fail_msg: "wp-config.php non trouvé !"
+        success_msg: "WordPress est correctement déployé !"

@@ -1,0 +1,41 @@
+<?php
+/**
+ * WordPress Configuration - Généré par Ansible
+ * NE PAS MODIFIER MANUELLEMENT
+ *
+ * Correspond au script original :
+ *   sed -i "s/database_name_here/wordpress/" wp-config.php
+ *   sed -i "s/username_here/example/" wp-config.php
+ *   sed -i "s/password_here/examplePW/" wp-config.php
+ *   sed -i "s/localhost/localhost/" wp-config.php
+ */
+
+// ** Database settings ** //
+define( 'DB_NAME',     '{{ wp_db_name }}' );
+define( 'DB_USER',     '{{ wp_db_user }}' );
+define( 'DB_PASSWORD', '{{ wp_db_password }}' );
+define( 'DB_HOST',     '{{ wp_db_host }}' );
+define( 'DB_CHARSET',  'utf8' );
+define( 'DB_COLLATE',  '' );
+
+/**
+ * Authentication unique keys and salts.
+ */
+define( 'AUTH_KEY',         '{{ lookup("password", "wp_auth_key length=64 chars=ascii_letters,digits") }}' );
+define( 'SECURE_AUTH_KEY',  '{{ lookup("password", "wp_secure_auth_key length=64 chars=ascii_letters,digits") }}' );
+define( 'LOGGED_IN_KEY',    '{{ lookup("password", "wp_logged_in_key length=64 chars=ascii_letters,digits") }}' );
+define( 'NONCE_KEY',        '{{ lookup("password", "wp_nonce_key length=64 chars=ascii_letters,digits") }}' );
+define( 'AUTH_SALT',        '{{ lookup("password", "wp_auth_salt length=64 chars=ascii_letters,digits") }}' );
+define( 'SECURE_AUTH_SALT', '{{ lookup("password", "wp_secure_auth_salt length=64 chars=ascii_letters,digits") }}' );
+define( 'LOGGED_IN_SALT',   '{{ lookup("password", "wp_logged_in_salt length=64 chars=ascii_letters,digits") }}' );
+define( 'NONCE_SALT',       '{{ lookup("password", "wp_nonce_salt length=64 chars=ascii_letters,digits") }}' );
+
+$table_prefix = 'wp_';
+
+define( 'WP_DEBUG', false );
+
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
+require_once ABSPATH . 'wp-settings.php';

@@ -1,0 +1,44 @@
+---
+namespace: "arkeinm"
+name: "wordpress-apache"
+version: "1.0.0"
+
+description: "Apache-based Ansible role to install and configure WordPress with Apache, PHP, and MariaDB"
+
+authors:
+  - "Your Name"
+
+license: "GPL-3.0-or-later"
+
+min_ansible_version: "2.9"
+
+repository: "https://github.com/yourusername/ansible-wordpress-apache"
+
+tags:
+  - wordpress
+  - apache
+  - php
+  - mariadb
+  - webserver
+  - cms
+  - ubuntu
+  - debian
+  - rocky
+  - redhat
+
+platforms:
+  - name: "Ubuntu"
+    versions:
+      - "20.04"
+      - "22.04"
+  - name: "Debian"
+    versions:
+      - "10"
+      - "11"
+      - "12"
+  - name: "EL"
+    versions:
+      - "8"
+      - "9"
+
+dependencies: []

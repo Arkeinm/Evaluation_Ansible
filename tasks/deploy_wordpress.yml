@@ -1,0 +1,57 @@
+---
+
+- name: Vérifier si WordPress est déjà déployé
+  ansible.builtin.stat:
+    path: "{{ wp_wordpress_install_dir }}/wp-settings.php"
+  register: wp_wordpress_is_deployed
+
+- name: Supprimer les fichiers par défaut
+  ansible.builtin.file:
+    path: "{{ wp_wordpress_install_dir }}/{{ item }}"
+    state: absent
+  loop:
+    - index.html
+  when: wp_wordpress_is_deployed.stat.exists | not
+
+- name: Télécharger et extraire WordPress
+  block:
+    - name: Télécharger WordPress
+      ansible.builtin.get_url:
+        url: "{{ wp_wordpress_download_url }}"
+        dest: /tmp/latest.zip
+        mode: '0644'
+      retries: 3
+      delay: 5
+    
+    - name: Extraire WordPress
+      ansible.builtin.unarchive:
+        src: /tmp/latest.zip
+        dest: /tmp/
+        remote_src: yes
+  when: wp_wordpress_is_deployed.stat.exists | not
+
+- name: Copier et configurer les fichiers WordPress
+  block:
+    - name: Déployer les fichiers WordPress
+      ansible.builtin.copy:
+        src: /tmp/wordpress/
+        dest: "{{ wp_wordpress_install_dir }}"
+        remote_src: yes
+        owner: "{{ wp_apache_user }}"
+        group: "{{ wp_apache_group }}"
+        mode: preserve
+    
+    - name: Appliquer les droits d'accès
+      ansible.builtin.file:
+        path: "{{ wp_wordpress_install_dir }}"
+        mode: '0755'
+        owner: "{{ wp_apache_user }}"
+        group: "{{ wp_apache_group }}"
+        recurse: yes
+  when: wp_wordpress_is_deployed.stat.exists | not
+
+- name: Nettoyer les fichiers temporaires
+  ansible.builtin.shell: rm -rf /tmp/latest.zip /tmp/wordpress
+  changed_when: false
+  ignore_errors: yes
+  when: wp_wordpress_is_deployed.stat.exists | not

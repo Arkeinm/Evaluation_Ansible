@@ -1,0 +1,80 @@
+---
+
+- name: Initialiser MariaDB
+  block:
+    - name: Préparation du datadir
+      ansible.builtin.command: mysql_install_db --user=mysql --datadir=/var/lib/mysql
+      args:
+        creates: /var/lib/mysql/mysql
+      when: wp_deployment_is_container
+    
+    - name: Démarrer MariaDB en conteneur
+      ansible.builtin.shell: |
+        if ! pgrep -x mariadbd > /dev/null && ! pgrep -x mysqld > /dev/null; then
+          mysqld_safe --datadir=/var/lib/mysql &
+          sleep 5
+        fi
+      args:
+        executable: /bin/bash
+      changed_when: false
+      when: wp_deployment_is_container
+    
+    - name: Démarrer MariaDB sur VM
+      ansible.builtin.service:
+        name: mariadb
+        state: started
+        enabled: yes
+      when: wp_deployment_is_container | not
+
+- name: Vérifier que MariaDB est accessible
+  ansible.builtin.wait_for:
+    path: /var/run/mysqld/mysqld.sock
+    state: present
+    timeout: 30
+
+- name: Définir le mot de passe root MariaDB
+  community.mysql.mysql_user:
+    name: root
+    host: localhost
+    password: "{{ wp_db_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    state: present
+
+- name: Supprimer les utilisateurs anonymes
+  community.mysql.mysql_user:
+    name: ""
+    host_all: yes
+    state: absent
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Supprimer la base de données test
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+# --- Création BDD et utilisateur WordPress ---
+# Script original : CREATE DATABASE wordpress; CREATE USER 'example'@'localhost' ...
+
+- name: Créer la base de données WordPress
+  community.mysql.mysql_db:
+    name: "{{ wp_db_name }}"
+    state: present
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Créer l'utilisateur WordPress et attribuer les privilèges
+  community.mysql.mysql_user:
+    name: "{{ wp_db_user }}"
+    password: "{{ wp_db_password }}"
+    priv: "{{ wp_db_name }}.*:ALL,GRANT"
+    host: "{{ wp_db_host }}"
+    state: present
+    login_user: root
+    login_password: "{{ wp_db_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock

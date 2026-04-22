@@ -1,0 +1,15 @@
+---
+
+wp_apache_service: "httpd"
+wp_apache_user: "apache"
+wp_apache_group: "apache"
+wp_apache_config_dir: "/etc/httpd/conf.d"
+wp_apache_config_enabled_dir: "/etc/httpd/conf.d"
+
+wp_required_packages:
+  - httpd
+  - php
+  - php-mysqlnd
+  - mariadb-server
+  - wget
+  - unzip

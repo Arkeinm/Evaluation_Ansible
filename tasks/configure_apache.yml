@@ -1,0 +1,40 @@
+---
+
+- name: Démarrer les services Apache si nécessaire
+  block:
+    - name: (VM) Démarrer et activer Apache
+      ansible.builtin.service:
+        name: "{{ wp_apache_service }}"
+        state: started
+        enabled: yes
+      when: wp_deployment_is_container | not
+  rescue:
+    - name: Message d'erreur - Apache
+      ansible.builtin.debug:
+        msg: "Avertissement: impossible de démarrer Apache immédiatement"
+
+- name: Configurer la VirtualHost Apache
+  block:
+    - name: Ajouter la configuration du site
+      ansible.builtin.template:
+        src: wordpress.conf.j2
+        dest: "{{ wp_apache_config_dir }}/wordpress.conf"
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart apache
+    
+    - name: Modules Apache (Debian)
+      block:
+        - name: Activer le site
+          ansible.builtin.command: a2ensite wordpress.conf
+          args:
+            creates: "{{ wp_apache_config_enabled_dir }}/wordpress.conf"
+          notify: restart apache
+        
+        - name: Activer le module rewrite
+          ansible.builtin.command: a2enmod rewrite
+          args:
+            creates: /etc/apache2/mods-enabled/rewrite.load
+          notify: restart apache
+      when: ansible_os_family == "Debian"

@@ -1,0 +1,16 @@
+---
+
+wp_apache_service: "apache2"
+wp_apache_user: "www-data"
+wp_apache_group: "www-data"
+wp_apache_config_dir: "/etc/apache2/sites-available"
+wp_apache_config_enabled_dir: "/etc/apache2/sites-enabled"
+
+wp_required_packages:
+  - apache2
+  - php
+  - libapache2-mod-php
+  - php-mysql
+  - mariadb-server
+  - wget
+  - unzip

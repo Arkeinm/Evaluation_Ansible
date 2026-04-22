@@ -1,0 +1,24 @@
+---
+
+- name: Préparer l'environnement système
+  block:
+    - name: Mettre à jour le cache apt (Debian)
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+    
+    - name: Mettre à jour le cache dnf (RedHat)
+      ansible.builtin.dnf:
+        update_cache: yes
+      when: ansible_os_family == "RedHat"
+
+- name: Déployer les paquets système
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ wp_required_packages }}"
+  retries: 2
+  delay: 3
+  retries: 2
+  delay: 3

@@ -1,0 +1,10 @@
+---
+
+- name: Déployer wp-config.php depuis le template
+  ansible.builtin.template:
+    src: wp-config.php.j2
+    dest: "{{ wp_wordpress_install_dir }}/wp-config.php"
+    owner: "{{ wp_apache_user }}"
+    group: "{{ wp_apache_group }}"
+    mode: '0640'
+  notify: restart apache
