@@ -26,9 +26,11 @@ Il est conçu pour fonctionner aussi bien sur des machines virtuelles que dans d
 
 ---
 
+Récupérez le code de ce repository et mettez le dans votre dossier où se situe vos rôles et nommez le "ansible-role-wp"
+
 ## ▶️ Mise en œuvre
 
-### Exemple de playbook
+### Exemple de playbook afin d'exécuter le role
 
 ```yaml
 ---
@@ -37,7 +39,7 @@ Il est conçu pour fonctionner aussi bien sur des machines virtuelles que dans d
   become: true
 
   roles:
-    - ansible-role-wordpress
+    - ansible-role-wp
 ```
 
 ## Exécution 
